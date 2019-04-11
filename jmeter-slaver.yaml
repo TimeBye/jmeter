@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jmeter
+spec:
+  clusterIP: None
+  ports:
+  - port: 1099
+    name: server
+  selector:
+    app: jmeter
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: jmeter
+  labels:
+    app: jmeter
+spec:
+  serviceName: jmeter
+  replicas: 5
+  selector:
+    matchLabels:
+      app: jmeter
+  template:
+    metadata:
+      labels:
+        app: jmeter
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - jmeter
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: jmeter
+        image: setzero/jmeter:5.1.1
+        ports:
+        - name: server
+          containerPort: 1099
+        env:
+        - name: RMI_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        args:
+        - jmeter-server
+        - -Djava.rmi.server.hostname=$(RMI_HOST)
+        - -Dserver.rmi.ssl.disable=true
