@@ -42,7 +42,7 @@
 - 运行控制端
 
   ```
-  kubectl run jmeter-master --image=setzero/jmeter:5.1.1 -it --restart=Never --command -- bash
+  kubectl run jmeter-master --image=setzero/jmeter:5.1.1 -it --restart=Never --rm bash
   ```
 
 - 另开窗口，将保存的脚本复制到jmeter-master pod中
@@ -57,11 +57,7 @@
       -n \
       -t /self.jmx \
       -l /result.jtl \
-      -R jmeter-0.jmeter.jmeter.svc,\
-         jmeter-1.jmeter.jmeter.svc,\
-         jmeter-2.jmeter.jmeter.svc,\
-         jmeter-3.jmeter.jmeter.svc,\
-         jmeter-4.jmeter.jmeter.svc
+      -R jmeter-0.jmeter.jmeter.svc,jmeter-1.jmeter.jmeter.svc,jmeter-2.jmeter.jmeter.svc,jmeter-3.jmeter.jmeter.svc,jmeter-4.jmeter.jmeter.svc
   ```
 
 - 另开窗口，保存压测结果
